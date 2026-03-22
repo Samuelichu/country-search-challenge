@@ -69,7 +69,7 @@ export class CountryList extends LitElement {
             ${this.countries.slice(0, this.limit).map(
               c =>
                 html`<li>
-                  <button @click="${() => this.chooseCountry(c.name.common)}">
+                  <button @click="${() => this.chooseCountry(c)}">
                     ${c.name.common}
                   </button>
                 </li>`,
@@ -78,7 +78,14 @@ export class CountryList extends LitElement {
         `;
       case 'again':
         return html`
-          <div class="again-item">lo tienes que intentar otra vez</div>
+          <div class="again-item">
+            No se pudo cargar la información. Intentalo de nuevo
+          </div>
+          <button @click="${this._loadSearch}">Volver a cargar</button>
+        `;
+      case 'empty':
+        return html`
+          <div class="again-item">No encontramos un país con ese nombre</div>
         `;
       default:
         return html`
@@ -91,11 +98,11 @@ export class CountryList extends LitElement {
     }
   }
 
-  chooseCountry(name) {
+  chooseCountry(country) {
     this.dispatchEvent(
       new CustomEvent('country-select', {
         bubbles: true,
-        detail: { selectedCountry: name },
+        detail: country,
         composed: true,
       }),
     );
