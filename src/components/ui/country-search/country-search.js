@@ -3,8 +3,7 @@ import { LitElement, html, css } from 'lit';
 export class CountrySearch extends LitElement {
   static properties = {
     searchValue: { type: String },
-    countries: { type: Array },
-    isLoading: { type: Boolean },
+    _isLoading: { type: Boolean },
   };
 
   static styles = css`
@@ -22,40 +21,36 @@ export class CountrySearch extends LitElement {
   constructor() {
     super();
     this.searchValue = '';
-    this.countries = ['opción 1', 'opción 2', 'opción 3'];
-    this.isLoading = true;
+    this._isLoading = false;
+    this.timeout = null;
   }
 
   debounceUpdate(e) {
+    this._isLoading = true;
     this.searchValue = e.target.value;
-    this.isLoading = true;
-    setTimeout(() => {
-      this.isLoading = false;
+    clearTimeout(this.timeout);
+    this.timeout = setTimeout(() => {
+      this._isLoading = false;
+      this.dispatchEvent(
+        new CustomEvent('country-search-change', {
+          bubbles: true,
+          composed: true,
+          detail: { info: this.searchValue },
+        }),
+      );
     }, 9000);
-
-    this.dispatchEvent(
-      new CustomEvent('country-search-change', {
-        bubbles: true,
-        detail: { info: this.searchValue },
-        composed: true,
-      }),
-    );
   }
 
   render() {
     return html`
       <input
-        type="text"
-        list="countries-list"
-        @input="${this.debounceUpdate}"
-        .value="${this.searchValue}"
-        placeholder="buscando..."
+        type="search"
+        @input=${this.debounceUpdate}
+        .value=${this.searchValue}
+        placeholder="Buscar un país..."
       />
-      <datalist id="countries-list">
-        ${this.isLoading
-          ? html`<option value="Cargando..."></option>`
-          : this.countries.map(c => html`<option value="${c}"></option>`)}
-      </datalist>
+
+      ${this._isLoading ? html`<p>Buscando...</p>` : ''}
     `;
   }
 }
