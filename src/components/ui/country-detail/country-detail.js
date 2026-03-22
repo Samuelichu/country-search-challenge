@@ -3,7 +3,6 @@ import { LitElement, html, css } from 'lit';
 export class CountryDetail extends LitElement {
   static properties = {
     selectedCountry: { type: Object },
-    status: { type: String },
   };
 
   static styles = css`
@@ -48,6 +47,7 @@ export class CountryDetail extends LitElement {
   constructor() {
     super();
     this.isLoading = true;
+    this.selectedCountry = null;
   }
 
   connectedCallback() {
@@ -64,10 +64,27 @@ export class CountryDetail extends LitElement {
   }
 
   render() {
-    return html`
-      <button @click="${this.backPage}">Volver atrás</button>
-    `;
-  }
+  return html`
+    <h2>Detalle del país</h2>
+    <div>
+      <p><strong>Población:</strong> ${this.selectedCountry?.population}</p>
+      <p><strong>Área:</strong> ${this.selectedCountry?.area}</p>
+      <p><strong>Idiomas:</strong></p>
+      <ul>
+        ${Object.values(this.selectedCountry?.languages ?? {}).map(l => html`<li>${l}</li>`)}
+      </ul>
+      <p><strong>Monedas:</strong></p>
+      <ul>
+        ${Object.values(this.selectedCountry?.currencies ?? {}).map(c => html`<li>${c.name} (${c.symbol})</li>`)}
+      </ul>
+      <p><strong>Zonas horarias:</strong></p>
+      <ul>
+        ${this.selectedCountry?.timezones?.map(t => html`<li>${t}</li>`)}
+      </ul>
+    </div>
+    <button @click=${this.backPage}>Volver atrás</button>
+  `;
+}
 }
 
 customElements.define('country-detail', CountryDetail);
