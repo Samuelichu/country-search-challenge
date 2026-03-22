@@ -1,12 +1,14 @@
 import { LitElement, html, css } from 'lit';
 import '../../ui/country-search/country-search.js';
 import '../../ui/country-list/country-list.js';
+import '../../ui/country-detail/country-detail.js';
 import { getCountries, getCountry } from '../../../api/router.js';
 class CountryExplorer extends LitElement {
   static properties = {
     _countries: { type: Array },
     _countriesFiltered: { type: Array },
     _status: { type: String },
+    _selectedCountry: { type: Object },
   };
 
   static styles = css`
@@ -56,12 +58,13 @@ class CountryExplorer extends LitElement {
     this._countries = [];
     this._countriesFiltered = [];
     this._status = '';
+    this._selectedCountry = null;
   }
 
   connectedCallback() {
     super.connectedCallback();
     setTimeout(() => {
-    this._loadSearch();
+      this._loadSearch();
     }, 2000);
   }
 
@@ -69,6 +72,7 @@ class CountryExplorer extends LitElement {
     try {
       const data = await getCountries();
       this._countries = data;
+      this._countriesFiltered = data;
       this._status = 'start';
     } catch (error) {
       this._status = 'again';
@@ -82,17 +86,42 @@ class CountryExplorer extends LitElement {
           c.name.common.toLowerCase().includes(searchValue.toLowerCase()),
         )
       : this._countries;
+    this._status = this._countriesFiltered.length === 0 ? 'empty' : 'start';
+  }
+
+  async getCountryDetail(country) {
+    try {
+      const dataCountry = await getCountry(country.detail.name.common);
+      console.log('el pais es', dataCountry);
+      this._selectedCountry = dataCountry;
+    } catch (error) {
+      console.error('Error al cargar el detalle del país:', error);
+    }
+  }
+
+  _handleBack() {
+    this._selectedCountry = null;
   }
 
   render() {
     return html`
       <country-search
-        @country-search-change="${this._filterCountries}"
+        @country-search-change=${this._filterCountries}
       ></country-search>
       <country-list
-        .countries="${this._countriesFiltered}"
-        .status="${this._status}"
+        @country-select=${this.getCountryDetail}
+        .countries=${this._countriesFiltered}
+        .status=${this._status}
       ></country-list>
+
+      ${this._selectedCountry
+        ? html`
+            <country-detail
+              @country-detail-back=${this._handleBack}
+              .selectedCountry=${this._selectedCountry}
+            ></country-detail>
+          `
+        : ''}
     `;
   }
 }

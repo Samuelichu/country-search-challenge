@@ -16,12 +16,10 @@ export const getCountries = async () => {
 
 export const getCountry = async name => {
   try {
-    const response = await fetch(
-      `${BASE_URL}/name/${name}?fields=name,capital,currencies`,
-    );
+    const response = await fetch(`${BASE_URL}/name/${name}`);
     if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
     const data = await response.json();
-    return data;
+    return data[0];
   } catch (error) {
     console.error('Fallo al buscar país:', error);
     return [];
