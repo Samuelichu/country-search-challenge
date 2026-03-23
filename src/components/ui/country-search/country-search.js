@@ -56,14 +56,15 @@ export class CountrySearch extends LitElement {
           detail: { info: this.searchValue },
         }),
       );
-    }, 9000);
+    }, 300);
   }
 
   render() {
     return html`
-      <div class="search-container">
+      <div class="search-container" role="search">
         <input
           type="search"
+          aria-label="Buscador de un país"
           @input=${this.debounceUpdate}
           .value=${this.searchValue}
           placeholder="Buscar un país..."

@@ -10,12 +10,6 @@ export class CountryList extends LitElement {
     :host {
       display: block;
     }
-    input {
-      padding: 8px;
-      background-color: #c71717;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
 
     button {
       padding: 8px 16px;
@@ -27,12 +21,15 @@ export class CountryList extends LitElement {
     }
 
     .countries-list {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: 16px;
       list-style: none;
       padding: 0;
+      margin: 0;
+      width: 100%;
     }
+
     .card-container {
       width: 100%;
       display: flex;
@@ -66,18 +63,12 @@ export class CountryList extends LitElement {
     }
 
     .skeleton-item {
+      display: block;
+      width: 250px;
+      height: 120px;
+      min-height: 80px;
       background-color: #e0e0e0;
-      height: 20px;
-      margin: 10px 0;
-      border-radius: 4px;
-      animation: skeleton-loading 1.5s infinite linear;
-    }
-
-    .skeleton-item {
-      background-color: #e0e0e0;
-      height: 20px;
-      margin: 10px 0;
-      border-radius: 4px;
+      border-radius: 12px;
       animation: skeleton-loading 1.5s infinite linear;
     }
 
@@ -90,6 +81,16 @@ export class CountryList extends LitElement {
       }
       100% {
         background-color: #e0e0e0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .countries-list {
+        grid-template-columns: 1fr;
+      }
+
+      .card-container {
+        padding: 8px;
       }
     }
   `;
@@ -105,7 +106,7 @@ export class CountryList extends LitElement {
     switch (this.status) {
       case 'start':
         return html`
-          <ul class="countries-list">
+          <ul class="countries-list" aria-label="Lista de países">
             ${this.countries.slice(0, this.limit).map(
               c => html`
                 <li class="card-item">
@@ -132,7 +133,7 @@ export class CountryList extends LitElement {
         `;
       case 'again':
         return html`
-          <div class="again-item">
+          <div class="again-item" role="alert" aria-live="assertive">
             No se pudo obtener informacion sobre tu busqueda. Intentalo de nuevo
           </div>
           <button @click="${this._loadSearch}">Volver a cargar</button>
@@ -145,7 +146,11 @@ export class CountryList extends LitElement {
         `;
       default:
         return html`
-          <ul class="countries-list">
+          <ul
+            class="countries-list"
+            aria-label="Cargando países"
+            aria-busy="true"
+          >
             ${Array(12)
               .fill(0)
               .map(() => html`<li><div class="skeleton-item"></div></li>`)}
@@ -153,8 +158,6 @@ export class CountryList extends LitElement {
         `;
     }
   }
-
-  
 
   chooseCountry(country) {
     this.dispatchEvent(

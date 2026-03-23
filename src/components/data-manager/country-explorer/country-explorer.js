@@ -2,7 +2,7 @@ import { LitElement, html, css } from 'lit';
 import '../../ui/country-search/country-search.js';
 import '../../ui/country-list/country-list.js';
 import '../../ui/country-detail/country-detail.js';
-import { getCountries, getCountry } from '../../../api/router.js';
+import { getCountries, getCountry } from '../../../api/requests.js';
 class CountryExplorer extends LitElement {
   static properties = {
     _countries: { type: Array },
@@ -58,7 +58,7 @@ class CountryExplorer extends LitElement {
     super();
     this._countries = [];
     this._countriesFiltered = [];
-    this._status = '';
+    this._status = 'loading';
     this._selectedCountry = null;
     this._abortController = new AbortController();
   }
@@ -99,24 +99,32 @@ class CountryExplorer extends LitElement {
 
   async getCountryDetail(country) {
     try {
+      const nameCountry = country.detail.name.common;
       const dataCountry = await getCountry(
-        country.detail.name.common,
+        nameCountry,
         this._abortController.signal,
       );
-      console.log('el pais es', dataCountry);
       this._selectedCountry = dataCountry;
+
+      await this.updateComplete;
+      this.shadowRoot.querySelector('country-detail').focus();
     } catch (error) {
       console.error('Error al cargar el detalle del país:', error);
     }
   }
 
-  _handleBack() {
+  async _handleBack() {
     this._selectedCountry = null;
+    await this.updateComplete;
+    this.shadowRoot.querySelector('country-search').focus();
   }
 
   render() {
     return html`
-      <div class="main-page ${this._selectedCountry ? 'hide-list' : ''}">
+      <div
+        class="main-page ${this._selectedCountry ? 'hide-list' : ''}"
+        aria-hidden=${this._selectedCountry ? 'true' : 'false'}
+      >
         <country-search
           @country-search-change=${this._filterCountries}
         ></country-search>
@@ -125,12 +133,22 @@ class CountryExplorer extends LitElement {
           .countries=${this._countriesFiltered}
           .status=${this._status}
           @country-select=${this.getCountryDetail}
-        ></country-list>
+          ><div slot="message-empty" class="custom-error">
+            No pudimos obtener información sobre el país
+            "${this._selectedCountry?.name?.common}", parece que no existe.
+          </div></country-list
+        >
       </div>
 
       ${this._selectedCountry
         ? html`
-            <div class="detail-page">
+            <div
+              class="detail-page"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Detalle del país ${this._selectedCountry?.name
+                ?.common}"
+            >
               <country-detail
                 .selectedCountry=${this._selectedCountry}
                 @country-detail-back=${this._handleBack}
