@@ -60,6 +60,7 @@ class CountryExplorer extends LitElement {
     this._countriesFiltered = [];
     this._status = '';
     this._selectedCountry = null;
+    this._abortController = new AbortController();
   }
 
   connectedCallback() {
@@ -69,13 +70,19 @@ class CountryExplorer extends LitElement {
     }, 2000);
   }
 
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._abortController.abort();
+  }
+
   async _loadSearch() {
     try {
-      const data = await getCountries();
+      const data = await getCountries(this._abortController.signal);
       this._countries = data;
       this._countriesFiltered = data;
       this._status = 'start';
     } catch (error) {
+      if (error.name === 'AbortError') return;
       this._status = 'again';
     }
   }
@@ -92,7 +99,10 @@ class CountryExplorer extends LitElement {
 
   async getCountryDetail(country) {
     try {
-      const dataCountry = await getCountry(country.detail.name.common);
+      const dataCountry = await getCountry(
+        country.detail.name.common,
+        this._abortController.signal,
+      );
       console.log('el pais es', dataCountry);
       this._selectedCountry = dataCountry;
     } catch (error) {

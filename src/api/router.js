@@ -1,9 +1,10 @@
 const BASE_URL = 'https://restcountries.com/v3.1';
 
-export const getCountries = async () => {
+export const getCountries = async signal => {
   try {
     const response = await fetch(
       `${BASE_URL}/all?fields=name,capital,currencies,region,flags`,
+      { signal },
     );
     if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
     const data = await response.json();
@@ -14,9 +15,9 @@ export const getCountries = async () => {
   }
 };
 
-export const getCountry = async name => {
+export const getCountry = async (name, signal) => {
   try {
-    const response = await fetch(`${BASE_URL}/name/${name}`);
+    const response = await fetch(`${BASE_URL}/name/${name}`, { signal });
     if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
     const data = await response.json();
     return data[0];
