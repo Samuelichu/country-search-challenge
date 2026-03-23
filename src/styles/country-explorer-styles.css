@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+:root {
+  /* colors */
+  --color-primary: #000000;
+  --color-secondary: #f7f4f4;
+  --color-background: #ffffff;
+  /* colors-detail */
+  --color-text: #444447;
+  --color-text-muted: #666666;
+  --color-accent: #1a2b42;
+  /* colors-skeleton */
+  --color-skeleton: #e0e0e0;
+
+  /* spacing */
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+
+  /* typography - families */
+  --font-primary: 'Montserrat', sans-serif;
+  --font-secondary: 'Open Sans', sans-serif;
+  --font-display: 'Gabarito', sans-serif;
+
+  /* typography - sizes */
+  --font-size-sm: 12px;
+  --font-size-md: 14px;
+  --font-size-lg: 18px;
+}

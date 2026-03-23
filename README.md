@@ -1,18 +1,14 @@
-<p align="center">
-  <img width="200" src="https://open-wc.org/hero.png"></img>
-</p>
 
-## Open-wc Starter App
-
-[![Built with open-wc recommendations](https://img.shields.io/badge/built%20with-open--wc-blue.svg)](https://github.com/open-wc)
-
-## Quickstart
-
-To get started:
+## Country Search Challenge
+Prueba Técnica - Desarrollador Frontend Web Components
+## Descripcion
+Desarrollo de un buscador de países utilizando **LitElement**, la idea es construir una aplicación basada en Web Components que consuma la API de REST Countries: "https://restcountries.com/", de manera que el usuario pueda explorar, filtrar y consultar el detalle de cada país.
+## Primeros pasos
+Para empezar a trabajar con este proyecto, empezamos ingresando los siguientes comandos por consola:
 
 ```bash
-npm init @open-wc
-# requires node 10 & npm 6 or higher
+npm install
+npm run start
 ```
 
 ## Scripts
@@ -24,8 +20,39 @@ npm init @open-wc
 - `lint` runs the linter for your project
 - `format` fixes linting and formatting errors
 
-## Tooling configs
+## Estructura del proyecto
+```
+src/
+├── api/
+│   ├── requests.js      → fetch centralizado, headers, errores
+├── components/
+│   ├── data-manager/
+│   │   └── country-explorer/
+│   │       └── country-explorer.js   → componente manager / DM
+│   └── ui/
+│       ├── country-search/
+│           └── country-search.js   → componente de busqueda / UI
+│       ├── country-list/
+│           └── country-list.js   → componente lista países / UI
+│       └── country-detail/
+│           └── country-detail.js   → componente lista detalle de país / UI
+├── styles/
+│   └── country-explorer-styles.css         → Estilos globales
+test/
+├── country-list.test.js
+└── country-search.test.js
+```
+## Decisión:
+Para justificar la decisión sobre el límite de resultados en el componente **country-list**, se tomó como base el principio de Responsabilidad Única (SRP).
+Cada componente debe tener un único proposito en el sistema o proyecto. En este caso, el componente **country-list** es responsable de la presentación de los datos, a diferencia del componente country-explorer que se encarga de la obtención y gestión de la información.
 
-For most of the tools, the configuration is in the `package.json` to reduce the amount of files in your project.
+Si el límite de resultados se gestionara desde el componente padre, este asumiría múltiples responsabilidades, rompiendo la separación de responsabilidades, aumentando el acoplamiento y dificultando el mantenimiento del código.
 
-If you customize the configuration a lot, you can consider moving them to individual files.
+## Uso de IA
+La inteligencia artificial fue empleada como herramienta de apoyo en aspectos específicos del desarrollo, tales como la implementación de patrones de código repetitivos, la adaptación de estilos y la consulta sobre el comportamiento de tecnologías que requerían mayor profundización. El resto de decisiones se tomaron de forma independiente. En este sentido, se utilizó principalmente como un mecanismo de validación y contraste, más que como una fuente principal de desarrollo.
+
+## Justificación de uso de Lit
+Se eligió **LitElement** principalmente por su sistema de reactividad declarativo. Esto representa una ventaja clara frente a los Web Components nativos, donde esa reactividad debe implementarse desde cero.
+
+No optaría por **LitElement** en aplicaciones con interacciones dinámicas, donde se requiera un control más preciso sobre el renderizado y el rendimiento, como en el caso de dashboards con actualizaciones constantes de información. En estos casos, se optarían por herramientas que ofrezcan un mayor control sobre el estado y el renderizado, como los frameworks más utilizados en la actualidad, de manera que se pueda facilitar el desarrollo. 
+
