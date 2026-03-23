@@ -3,7 +3,7 @@ const BASE_URL = 'https://restcountries.com/v3.1';
 export const getCountries = async () => {
   try {
     const response = await fetch(
-      `${BASE_URL}/all?fields=name,capital,currencies`,
+      `${BASE_URL}/all?fields=name,capital,currencies,region,flags`,
     );
     if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
     const data = await response.json();

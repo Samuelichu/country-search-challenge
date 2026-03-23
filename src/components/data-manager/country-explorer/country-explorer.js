@@ -25,31 +25,32 @@ class CountryExplorer extends LitElement {
       background-color: var(--country-search-challenge-background-color);
     }
 
-    main {
-      flex-grow: 1;
+    .main-page {
+      transition:
+        filter 0.4s ease,
+        transform 0.4s ease,
+        opacity 0.4s ease;
+      width: 100%;
+    }
+    .hide-list {
+      filter: blur(8px);
+      opacity: 0.6;
+      transform: scale(0.96);
+      pointer-events: none;
     }
 
-    .logo {
-      margin-top: 36px;
-      animation: app-logo-spin infinite 20s linear;
-    }
-
-    @keyframes app-logo-spin {
-      from {
-        transform: rotate(0deg);
-      }
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .app-footer {
-      font-size: calc(12px + 0.5vmin);
+    .detail-page {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.3);
+      display: flex;
+      justify-content: center;
       align-items: center;
-    }
-
-    .app-footer a {
-      margin-left: 5px;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease-out;
     }
   `;
 
@@ -105,21 +106,26 @@ class CountryExplorer extends LitElement {
 
   render() {
     return html`
-      <country-search
-        @country-search-change=${this._filterCountries}
-      ></country-search>
-      <country-list
-        @country-select=${this.getCountryDetail}
-        .countries=${this._countriesFiltered}
-        .status=${this._status}
-      ></country-list>
+      <div class="main-page ${this._selectedCountry ? 'hide-list' : ''}">
+        <country-search
+          @country-search-change=${this._filterCountries}
+        ></country-search>
+
+        <country-list
+          .countries=${this._countriesFiltered}
+          .status=${this._status}
+          @country-select=${this.getCountryDetail}
+        ></country-list>
+      </div>
 
       ${this._selectedCountry
         ? html`
-            <country-detail
-              @country-detail-back=${this._handleBack}
-              .selectedCountry=${this._selectedCountry}
-            ></country-detail>
+            <div class="detail-page">
+              <country-detail
+                .selectedCountry=${this._selectedCountry}
+                @country-detail-back=${this._handleBack}
+              ></country-detail>
+            </div>
           `
         : ''}
     `;

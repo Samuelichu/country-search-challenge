@@ -10,11 +10,29 @@ export class CountrySearch extends LitElement {
     :host {
       display: block;
     }
+    .search-container {
+      position: relative;
+      padding-top: 8px;
+    }
+
     input {
-      padding: 8px;
-      background-color: #c71717;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      border: 2px solid #d1d5db;
+      background-color: #ffffff;
+      height: 40px;
+      padding: 0 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #6b7280;
+    }
+
+    .search-text {
+      font-size: 12px;
+      color: #6b7280;
+      margin: 4px 0 0 0;
     }
   `;
 
@@ -43,14 +61,17 @@ export class CountrySearch extends LitElement {
 
   render() {
     return html`
-      <input
-        type="search"
-        @input=${this.debounceUpdate}
-        .value=${this.searchValue}
-        placeholder="Buscar un país..."
-      />
-
-      ${this._isLoading ? html`<p>Buscando...</p>` : ''}
+      <div class="search-container">
+        <input
+          type="search"
+          @input=${this.debounceUpdate}
+          .value=${this.searchValue}
+          placeholder="Buscar un país..."
+        />
+        ${this._isLoading
+          ? html`<p class="search-text">Buscando...</p>`
+          : ''}
+      </div>
     `;
   }
 }

@@ -25,6 +25,46 @@ export class CountryList extends LitElement {
       color: white;
       cursor: pointer;
     }
+
+    .countries-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      list-style: none;
+      padding: 0;
+    }
+    .card-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      text-align: left;
+      gap: 15px;
+    }
+
+    .card-container:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .card-image img {
+      width: 100%;
+      height: 30px;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+
+    .card-info {
+      display: flex;
+      flex-direction: column;
+      color: #333;
+    }
+
     .skeleton-item {
       background-color: #e0e0e0;
       height: 20px;
@@ -67,25 +107,41 @@ export class CountryList extends LitElement {
         return html`
           <ul class="countries-list">
             ${this.countries.slice(0, this.limit).map(
-              c =>
-                html`<li>
-                  <button @click="${() => this.chooseCountry(c)}">
-                    ${c.name.common}
+              c => html`
+                <li class="card-item">
+                  <button
+                    class="card-container"
+                    @click="${() => this.chooseCountry(c)}"
+                  >
+                    <div class="card-image">
+                      <img
+                        src="${c.flags?.png}"
+                        alt="Bandera de ${c.name.common}"
+                      />
+                    </div>
+                    <div class="card-info">
+                      <span>${c.name.official}</span>
+                      <span>${c.capital[0]}</span>
+                      <span>${c.region}</span>
+                    </div>
                   </button>
-                </li>`,
+                </li>
+              `,
             )}
           </ul>
         `;
       case 'again':
         return html`
           <div class="again-item">
-            No se pudo cargar la información. Intentalo de nuevo
+            No se pudo obtener informacion sobre tu busqueda. Intentalo de nuevo
           </div>
           <button @click="${this._loadSearch}">Volver a cargar</button>
         `;
       case 'empty':
         return html`
-          <div class="again-item">No encontramos un país con ese nombre</div>
+          <slot name="message-empty" class="again-item">
+            No encontramos un país el nombre que buscas.
+          </slot>
         `;
       default:
         return html`
@@ -97,6 +153,8 @@ export class CountryList extends LitElement {
         `;
     }
   }
+
+  
 
   chooseCountry(country) {
     this.dispatchEvent(
