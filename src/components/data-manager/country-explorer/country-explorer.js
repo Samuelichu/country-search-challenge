@@ -9,6 +9,7 @@ class CountryExplorer extends LitElement {
     _countriesFiltered: { type: Array },
     _status: { type: String },
     _selectedCountry: { type: Object },
+    _lastSearch: { type: String },
   };
 
   static styles = css`
@@ -17,21 +18,24 @@ class CountryExplorer extends LitElement {
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      font-size: calc(10px + 2vmin);
-      color: #1a2b42;
+      width: 100%;
       max-width: 960px;
       margin: 0 auto;
-      text-align: center;
-      background-color: var(--country-search-challenge-background-color);
+      padding: var(--spacing-lg);
+      box-sizing: border-box;
     }
 
     .main-page {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-lg);
+      width: 100%;
       transition:
         filter 0.4s ease,
         transform 0.4s ease,
         opacity 0.4s ease;
-      width: 100%;
     }
+
     .hide-list {
       filter: blur(8px);
       opacity: 0.6;
@@ -50,7 +54,6 @@ class CountryExplorer extends LitElement {
       justify-content: center;
       align-items: center;
       z-index: 1000;
-      animation: fadeIn 0.3s ease-out;
     }
   `;
 
@@ -58,11 +61,16 @@ class CountryExplorer extends LitElement {
     super();
     this._countries = [];
     this._countriesFiltered = [];
+    // DECISION: _status se incializa en 'loading' para que el componente
+    // country-list muestre el skeleton inmediatamente sin esperar a que lleguen los datos
     this._status = 'loading';
+    this._lastSearch = '';
     this._selectedCountry = null;
     this._abortController = new AbortController();
   }
 
+  // DECISION: La petición se utiliza connectedCallback y no el constructor para disparar
+  // porque el constructor no da garantías de que el componente se haya reenderizado
   connectedCallback() {
     super.connectedCallback();
     setTimeout(() => {
@@ -70,12 +78,15 @@ class CountryExplorer extends LitElement {
     }, 2000);
   }
 
+  // DECISION: Hago esto para que en caso el usuario navegue a otra vista,
+  // la aplicación no intente actualizar información que ya no se está mostrando.
   disconnectedCallback() {
     super.disconnectedCallback();
     this._abortController.abort();
   }
 
   async _loadSearch() {
+    this._status = 'loading';
     try {
       const data = await getCountries(this._abortController.signal);
       this._countries = data;
@@ -87,8 +98,13 @@ class CountryExplorer extends LitElement {
     }
   }
 
+  // DECISION: El filtro se mantiene en el componente padre para que el hijo
+  // no tenga que conocer la fuente de datos original. Además, es más eficiente,
+  // al solo procesarse una lista filtrada, esto evita que se manejen
+  // todos los resultados, en el componente hijo.
   _filterCountries(e) {
     const searchValue = e.detail.info;
+    this._lastSearch = searchValue;
     this._countriesFiltered = searchValue
       ? this._countries.filter(c =>
           c.name.common.toLowerCase().includes(searchValue.toLowerCase()),
@@ -132,10 +148,11 @@ class CountryExplorer extends LitElement {
         <country-list
           .countries=${this._countriesFiltered}
           .status=${this._status}
+          @country-search-reload=${this._loadSearch}
           @country-select=${this.getCountryDetail}
           ><div slot="message-empty" class="custom-error">
             No pudimos obtener información sobre el país
-            "${this._selectedCountry?.name?.common}", parece que no existe.
+            "${this._lastSearch}", parece que no existe.
           </div></country-list
         >
       </div>

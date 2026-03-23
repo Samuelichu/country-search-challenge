@@ -11,7 +11,7 @@ export const getCountries = async signal => {
     return data;
   } catch (error) {
     console.error('Fallo al cargar países:', error);
-    return [];
+    throw error;
   }
 };
 

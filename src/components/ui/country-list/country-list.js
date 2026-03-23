@@ -13,7 +13,7 @@ export class CountryList extends LitElement {
 
     button {
       padding: 8px 16px;
-      background-color: #000000;
+      background-color: var(--color-primary);
       border: none;
       border-radius: 4px;
       color: white;
@@ -23,7 +23,7 @@ export class CountryList extends LitElement {
     .countries-list {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+      gap: var(--spacing-md);
       list-style: none;
       padding: 0;
       margin: 0;
@@ -32,12 +32,13 @@ export class CountryList extends LitElement {
 
     .card-container {
       width: 100%;
+      height: 100%;
       display: flex;
       flex-direction: column;
-      padding: 12px;
-      background: #ffffff;
-      border: 1px solid #e0e0e0;
-      border-radius: 12px;
+      padding: var(--spacing-sm);
+      background: var(--color-secondary);
+      border: 1px solid var(--color-secondary);
+      border-radius: var(--spacing-sm);
       cursor: pointer;
       transition: all 0.2s ease-in-out;
       text-align: left;
@@ -45,7 +46,7 @@ export class CountryList extends LitElement {
     }
 
     .card-container:hover {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 12px var(--color-primary);
       transform: translateY(-2px);
     }
 
@@ -59,7 +60,70 @@ export class CountryList extends LitElement {
     .card-info {
       display: flex;
       flex-direction: column;
-      color: #333;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+    }
+    .card-item-name {
+      font-family: var(--font-primary);
+      font-size: var(--font-size-lg);
+      text-align: center;
+      font-weight: 600;
+      color: var(--color-accent);
+    }
+
+    .card-info-group {
+      display: flex;
+      justify-content: center;
+      gap: var(--spacing-sm);
+      flex-wrap: wrap;
+    }
+
+    .card-info-item {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      background: var(--color-secondary);
+      padding: 2px var(--spacing-sm);
+      border-radius: 20px;
+    }
+
+    .state-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-md);
+      padding: var(--spacing-lg);
+      text-align: center;
+    }
+
+    .state-message {
+      font-family: var(--font-secondary);
+      font-size: var(--font-size-md);
+      color: #555;
+      max-width: 320px;
+      line-height: 1.4;
+    }
+
+    .retry-button {
+      padding: var(--spacing-sm) var(--spacing-md);
+      background-color: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-family: var(--font-primary);
+      font-size: var(--font-size-md);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .retry-button:hover {
+      opacity: 0.85;
+      transform: translateY(-1px);
+    }
+
+    .retry-button:active {
+      transform: scale(0.98);
     }
 
     .skeleton-item {
@@ -67,20 +131,20 @@ export class CountryList extends LitElement {
       width: 250px;
       height: 120px;
       min-height: 80px;
-      background-color: #e0e0e0;
+      background-color: var(--color-skeleton);
       border-radius: 12px;
       animation: skeleton-loading 1.5s infinite linear;
     }
 
     @keyframes skeleton-loading {
       0% {
-        background-color: #e0e0e0;
+        background-color: var(--color-skeleton);
       }
       50% {
         background-color: #c0c0c0;
       }
       100% {
-        background-color: #e0e0e0;
+        background-color: var(--color-skeleton);
       }
     }
 
@@ -103,6 +167,8 @@ export class CountryList extends LitElement {
   }
 
   countriesLoad() {
+    // DECISION: El componente solo se enfoca en la presentación, se limita a mostrar máximo 12 resultados
+    //  por carga para optimizar el renderizado.
     switch (this.status) {
       case 'start':
         return html`
@@ -121,9 +187,16 @@ export class CountryList extends LitElement {
                       />
                     </div>
                     <div class="card-info">
-                      <span>${c.name.official}</span>
-                      <span>${c.capital[0]}</span>
-                      <span>${c.region}</span>
+                      <span class="card-item-name">${c.name.official}</span>
+                      <div class="card-info-group">
+                        <span class="card-info-item">
+                          <strong>Capital:</strong> ${c.capital?.[0] ??
+                          'Sin capital'}
+                        </span>
+                        <span class="card-info-item">
+                          <strong>Región:</strong> ${c.region}
+                        </span>
+                      </div>
                     </div>
                   </button>
                 </li>
@@ -133,16 +206,24 @@ export class CountryList extends LitElement {
         `;
       case 'again':
         return html`
-          <div class="again-item" role="alert" aria-live="assertive">
-            No se pudo obtener informacion sobre tu busqueda. Intentalo de nuevo
+          <div class="state-container" role="alert" aria-live="assertive">
+            <p class="state-message">
+              No se pudo obtener la información. Inténtalo nuevamente.
+            </p>
+            <button class="retry-button" @click="${this._reloadSearch}">
+              Reintentar
+            </button>
           </div>
-          <button @click="${this._loadSearch}">Volver a cargar</button>
         `;
       case 'empty':
         return html`
-          <slot name="message-empty" class="again-item">
-            No encontramos un país el nombre que buscas.
-          </slot>
+          <div class="state-container">
+            <slot name="message-empty">
+              <p class="state-message">
+                No se encontraron resultados para tu búsqueda.
+              </p>
+            </slot>
+          </div>
         `;
       default:
         return html`
@@ -164,6 +245,17 @@ export class CountryList extends LitElement {
       new CustomEvent('country-select', {
         bubbles: true,
         detail: country,
+        composed: true,
+      }),
+    );
+  }
+
+  // DECISION: Se emite el evento ya que el padre es el encargado de realizar esta peticion,
+  // el componente vuelve a seguir su flujo normal.
+  _reloadSearch() {
+    this.dispatchEvent(
+      new CustomEvent('country-search-reload', {
+        bubbles: true,
         composed: true,
       }),
     );

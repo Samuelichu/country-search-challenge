@@ -16,8 +16,8 @@ export class CountryDetail extends LitElement {
       display: flex;
       flex-direction: column;
       gap: var(--spacing-lg);
-      font-family: var(--font-primary);
-      color: #444447;
+      font-family: var(--font-secondary);
+      color: var(--color-primary);
       box-shadow:
         inset -2px 2px hsl(0 0% 100% / 1),
         -20px 20px 40px hsl(0 0% 0% / 0.25);
@@ -26,7 +26,7 @@ export class CountryDetail extends LitElement {
     }
 
     h2 {
-      font-size: var(--font-size-xl);
+      font-size: var(--font-size-lg);
       font-weight: bold;
       margin: 0;
     }
@@ -47,13 +47,13 @@ export class CountryDetail extends LitElement {
 
     span {
       font-size: var(--font-size-sm);
-      color: #666;
+      color: var(--color-text-muted);
     }
 
     button {
       align-self: flex-end;
       padding: var(--spacing-sm) var(--spacing-md);
-      background: var(--color-primary, #000);
+      background: var(--color-primary);
       border: none;
       border-radius: 4px;
       color: white;
@@ -67,7 +67,7 @@ export class CountryDetail extends LitElement {
     }
 
     button:focus-visible {
-      outline: 2px solid #1a2b42;
+      outline: 2px solid var(--color-accent);
       outline-offset: 2px;
     }
 
@@ -101,6 +101,8 @@ export class CountryDetail extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    // DECISION: Se busca mejorar la accesibilidad añadiendo un listener
+    // de teclado para permitir cerrar el modal con la tecla Escape
     this._handleKeydown = e => {
       if (e.key === 'Escape') {
         this.backPage();
@@ -111,6 +113,8 @@ export class CountryDetail extends LitElement {
 
   disconnectedCallback() {
     super.disconnectedCallback();
+    // DECISION: Se elimina el listener al desmontar el componente para
+    // evitar fugas de memoria y errores al intentar acceder a un componente que ya no existe
     window.removeEventListener('keydown', this._handleKeydown);
   }
 

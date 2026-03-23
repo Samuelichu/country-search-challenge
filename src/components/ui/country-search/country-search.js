@@ -10,19 +10,22 @@ export class CountrySearch extends LitElement {
     :host {
       display: block;
     }
+
     .search-container {
       position: relative;
-      padding-top: 8px;
+      padding-top: var(--spacing-sm);
     }
 
     input {
       border: 2px solid #d1d5db;
-      background-color: #ffffff;
+      background-color: var(--color-background);
       height: 40px;
-      padding: 0 20px;
+      padding: 0 var(--spacing-md);
       border-radius: 8px;
-      font-size: 14px;
+      font-size: var(--font-size-md);
+      font-family: var(--font-primary);
       outline: none;
+      min-width: 250px;
     }
 
     input:focus {
@@ -30,9 +33,16 @@ export class CountrySearch extends LitElement {
     }
 
     .search-text {
-      font-size: 12px;
+      font-size: var(--font-size-sm);
       color: #6b7280;
       margin: 4px 0 0 0;
+    }
+
+    @media (max-width: 480px) {
+      input {
+        height: 36px;
+        font-size: var(--font-size-sm);
+      }
     }
   `;
 
@@ -44,6 +54,9 @@ export class CountrySearch extends LitElement {
   }
 
   debounceUpdate(e) {
+    // DECISION: Se aplica debounce para evitar disparar eventos en cada tecla.
+    // se utiliza con el único fin de reducirde procesamiento y
+    // peticiones innecesarias en el componenteal padre.
     this._isLoading = true;
     this.searchValue = e.target.value;
     clearTimeout(this.timeout);
@@ -69,9 +82,7 @@ export class CountrySearch extends LitElement {
           .value=${this.searchValue}
           placeholder="Buscar un país..."
         />
-        ${this._isLoading
-          ? html`<p class="search-text">Buscando...</p>`
-          : ''}
+        ${this._isLoading ? html`<p class="search-text">Buscando...</p>` : ''}
       </div>
     `;
   }
